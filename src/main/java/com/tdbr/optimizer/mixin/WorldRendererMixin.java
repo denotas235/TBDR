@@ -23,7 +23,7 @@ public class WorldRendererMixin {
     }
 
     @Inject(method = "renderLayer", at = @At("HEAD"))
-    private void onRenderLayerHead(RenderLayer renderLayer, double x, double y, double z, Matrix4f positionMatrix, CallbackInfo ci) {
+    private void onRenderLayerHead(RenderLayer renderLayer, double x, double y, double z, Matrix4f positionMatrix, Matrix4f projectionMatrix, CallbackInfo ci) {
         if (!TDBRDetector.IS_TDBR_ARCHITECTURE) return;
         String layerName = renderLayer.toString();
         if (layerName.contains("solid") || layerName.contains("cutout")) {
