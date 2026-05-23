@@ -26,7 +26,7 @@ public class ASTCTexture extends AbstractTexture {
 
     @Override
     public void load(ResourceManager manager) throws IOException {
-        Identifier astcId = new Identifier(sourceId.getNamespace(), 
+        Identifier astcId = Identifier.of(sourceId.getNamespace(), 
             sourceId.getPath().replace(".png", ".astc"));
         if (!manager.getResource(astcId).isPresent()) {
             throw new IOException("Arquivo ASTC nao encontrado: " + astcId);
