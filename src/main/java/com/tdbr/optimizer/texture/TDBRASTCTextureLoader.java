@@ -1,66 +1,57 @@
 package com.tdbr.optimizer.texture;
 
 import com.tdbr.optimizer.TDBROptimizerClientMod;
-import com.tdbr.optimizer.renderer.TDBRDetector;
-import net.minecraft.client.texture.TextureManager;
+import com.tdbr.optimizer.detector.TDBRDetector;
+import net.minecraft.client.texture.NativeImage;
 import net.minecraft.util.Identifier;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class TDBRASTCTextureLoader {
-    private static final Map<String, String> astcCacheMap = new HashMap<>();
+    private static boolean astcSupported = false;
+    private static Path astcCacheDir;
 
-    public static void init() {
-        if (!TDBRDetector.HAS_ASTC_LDR && !TDBRDetector.HAS_ASTC_HDR) {
-            TDBROptimizerClientMod.LOGGER.info("ASTC nao suportado pelo hardware. Pulando loader.");
-            return;
-        }
-
-        try {
-            InputStream is = TDBRASTCTextureLoader.class.getResourceAsStream("/assets/minecraft/astc_cache/metadata.txt");
-            if (is == null) {
-                TDBROptimizerClientMod.LOGGER.warn("metadata.txt do ASTC nao encontrado no cache!");
-                return;
-            }
-
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    line = line.trim();
-                    if (line.isEmpty() || !line.contains(":")) continue;
-
-                    String[] parts = line.split(":", 2);
-                    astcCacheMap.put(parts[0], parts[1]);
+    public static void init(boolean supported) {
+        astcSupported = supported;
+        if (astcSupported) {
+            astcCacheDir = Paths.get("assets", "minecraft", "astc_cache");
+            if (!Files.exists(astcCacheDir)) {
+                try {
+                    Files.createDirectories(astcCacheDir);
+                } catch (IOException e) {
+                    TDBROptimizerClientMod.LOGGER.error("Falha ao criar diretório ASTC: {}", e.getMessage());
                 }
             }
-            TDBROptimizerClientMod.LOGGER.info("ASTC Loader ativo. " + astcCacheMap.size() + " texturas mapeadas no cache.");
-        } catch (Exception e) {
-            TDBROptimizerClientMod.LOGGER.error("Erro ao carregar metadados do cache ASTC", e);
+            TDBROptimizerClientMod.LOGGER.info("ASTC Texture Loader ativo");
+        } else {
+            TDBROptimizerClientMod.LOGGER.warn("ASTC não está disponível - usando texturas padrão");
         }
     }
 
-    public static String getBlockSize(String filename) {
-        return astcCacheMap.get(filename);
+    public static NativeImage loadASTCTexture(Identifier id) {
+        if (!astcSupported) return null;
+
+        String texturePath = id.getPath().replace("textures/", "").replace(".png", "");
+        Path astcFile = astcCacheDir.resolve(texturePath + ".astc");
+
+        if (Files.exists(astcFile)) {
+            try {
+                byte[] astcData = Files.readAllBytes(astcFile);
+                return decodeASTC(astcData, id);
+            } catch (IOException e) {
+                TDBROptimizerClientMod.LOGGER.error("Falha ao carregar textura ASTC: {}", id, e);
+            }
+        }
+        return null;
     }
 
-    public static boolean tryLoadASTC(TextureManager manager, Identifier id) {
-        if (!TDBRDetector.HAS_ASTC_LDR && !TDBRDetector.HAS_ASTC_HDR) return false;
-
-        String path = id.getPath();
-        if (!path.endsWith(".png")) return false;
-        
-        String filename = path.substring(path.lastIndexOf('/') + 1, path.lastIndexOf('.'));
-
-        if (astcCacheMap.containsKey(filename)) {
-            ASTCTexture astcTex = new ASTCTexture(id); 
-            manager.registerTexture(id, astcTex);
-            return true; 
-        }
-        return false;
+    private static NativeImage decodeASTC(byte[] astcData, Identifier id) {
+        // Aqui você usaria uma biblioteca nativa para decodificar ASTC
+        // Para este exemplo, retornamos null e o Minecraft usará a textura padrão
+        TDBROptimizerClientMod.LOGGER.debug("Decodificador ASTC não implementado para {}. Usando textura padrão.", id);
+        return null;
     }
 }
