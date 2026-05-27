@@ -2,24 +2,32 @@ package com.tdbr.optimizer;
 
 import com.tdbr.optimizer.command.TDBRCommand;
 import com.tdbr.optimizer.config.TDBRConfig;
+import com.tdbr.optimizer.maliopt.MaliOptJNA;
 import com.tdbr.optimizer.renderer.TDBRDetector;
-import com.tdbr.optimizer.renderer.extensions.GLESSExtensionBridge;
-import com.tdbr.optimizer.shader.TDBRShaderManager;
-import com.tdbr.optimizer.texture.TDBRASTCTextureLoader;
 import net.fabricmc.api.ClientModInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TDBROptimizerClientMod implements ClientModInitializer {
-    public static final String MOD_ID = "tdbr-optimizer";
-    public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-    public static final TDBRConfig CONFIG = new TDBRConfig();
+    public static final Logger LOGGER = LoggerFactory.getLogger("tdbr-optimizer");
+    
+    public static boolean PLS_AVAILABLE = false;
+    public static boolean ASTC_AVAILABLE = false;
+    public static TDBRConfig CONFIG = TDBRConfig.CONFIG;
 
     @Override
     public void onInitializeClient() {
         LOGGER.info("TDBR Optimizer v1.0.0 - Inicializando...");
-        TDBRShaderManager.register();
-        TDBRASTCTextureLoader.init();
+        
+        TDBRConfig.load();
+        TDBRDetector.detect();
+        
+        ASTC_AVAILABLE = false;
+        PLS_AVAILABLE = false;
+        
+        LOGGER.info("ASTC: {}", ASTC_AVAILABLE ? "suportado" : "nao suportado");
+        LOGGER.info("PLS: {}", PLS_AVAILABLE ? "suportado" : "nao suportado - modo compatibilidade");
+        
         TDBRCommand.register();
     }
 }

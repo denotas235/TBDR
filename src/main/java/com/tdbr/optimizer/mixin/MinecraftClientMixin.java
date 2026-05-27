@@ -17,6 +17,7 @@ public class MinecraftClientMixin {
         if (!tdbrInitialized) {
             TDBRDetector.detect();
             GLESSExtensionBridge.tryLoadCriticalPointers();
+            com.tdbr.optimizer.texture.TDBRASTCTextureLoader.init();
             tdbrInitialized = true;
         }
     }

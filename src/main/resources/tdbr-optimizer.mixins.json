@@ -3,10 +3,8 @@
   "minVersion": "0.8",
   "package": "com.tdbr.optimizer.mixin",
   "compatibilityLevel": "JAVA_21",
-  "client": [
-    "MinecraftClientMixin",
-    "ParticleManagerMixin",
-    "NativeImageMixin"
+  "mixins": [
+    "TextureManagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
