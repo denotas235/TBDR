@@ -1,7 +1,4 @@
 .gradle/
 build/
 libs/
-.project
-.classpath
-.settings/
 *.log
