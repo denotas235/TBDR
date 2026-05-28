@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "tdbr-optimizer",
+  "version": "1.0.0",
+  "name": "TDBR Optimizer",
+  "description": "Otimiza Minecraft 1.21.1 para GPUs Tile-Based (Mali G52/Immortalis). Detecta extensões GLES e reduz overdraw.",
+  "authors": [
+    "Denotas Leonel Gomes (EngenhariaSonora)"
+  ],
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.tdbr.optimizer.TDBROptimizerClientMod"
+    ]
+  },
+  "mixins": [
+    "tdbr-optimizer.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.15.0",
+    "minecraft": "~1.21.1",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
